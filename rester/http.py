@@ -10,6 +10,10 @@ class HttpClient(object):
     ALLOWED_METHODS = ["get", "post", "put", "delete", "patch"]
 
     def __init__(self, **kwargs):
+        if kwargs.pop('session', False):
+            self._client = requests.Session()
+        else:
+            self._client = requests
         self.extra_request_opts = kwargs
 
     def request(self, api_url, method, headers, params, is_raw):
@@ -17,7 +21,7 @@ class HttpClient(object):
             '\n Invoking REST Call... api_url: %s, method: %s, headers: %s opts: %s', api_url, method, headers, self.extra_request_opts)
 
         try:
-            func = getattr(requests, method)
+            func = self._func(method)
         except AttributeError:
             self.logger.error('undefined HTTP method!!! %s', method)
             raise
@@ -43,4 +47,7 @@ class HttpClient(object):
         else:
             emit('Response:\n%s\n' + json.dumps(payload, sort_keys=True, indent=2))
 
-        return ResponseWrapper(response.status_code, payload, response.headers)
+        return ResponseWrapper(response.status_code, payload, rheaders)
+
+    def _func(self, method):
+        return getattr(self._client, method)
