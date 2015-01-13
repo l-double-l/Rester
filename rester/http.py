@@ -13,7 +13,7 @@ class HttpClient(object):
 
     def request(self, api_url, method, headers, params, is_raw):
         self.logger.info(
-            '\n Invoking REST Call... api_url: %s, method: %s, headers %s : ', api_url, method, headers)
+            '\n Invoking REST Call... api_url: %s, method: %s, headers: %s opts: %s', api_url, method, headers, self.extra_request_opts)
 
         try:
             func = getattr(requests, method)

@@ -66,7 +66,7 @@ class TestCaseExec(object):
         return params
 
     def _execute_test_step(self, test_step):
-        http_client = HttpClient(**self.case.request_opts)
+        http_client = HttpClient(**dict(test_step.get('request_opts', {}).items().items() + self.case.request_opts.items()))
         failures = Failure([], None)
         try:
             method = getattr(test_step, 'method', 'get')

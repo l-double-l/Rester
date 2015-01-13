@@ -1,4 +1,5 @@
-
+import re
+import os
 
 class DictWrapper(object):
     def __init__(self, d):
@@ -15,10 +16,21 @@ class DictWrapper(object):
                         setattr(self, "%s[%s]" % (key, index), DictWrapper(item) if isinstance(item, dict) else item)
                 else:
                     setattr(self, key, DictWrapper(value)
-                            if isinstance(value, dict) else value)
+                            if isinstance(value, dict) else self.__transform_value(value))
 
     def get(self, name, default):
         return self.__dict__.get(name, default)
+
+    def __transform_value(self, value):
+        if isinstance(value, str) or isinstance(value, unicode):
+            m = re.search('@(.*)@', value)
+            if m:
+                with open(os.path.join('input_cases', m.group(1))) as f_xml:
+                    return f_xml.read().replace('\n','')
+            else:
+                return value
+
+        return value
 
     def __getattr__(self, name):
         levels = name.split(".")
