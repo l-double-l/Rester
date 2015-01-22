@@ -25,7 +25,7 @@ class DictWrapper(object):
         if isinstance(value, str) or isinstance(value, unicode):
             m = re.search('@(.*)@', value)
             if m:
-                with open(os.path.join('input_cases', m.group(1))) as f_xml:
+                with open(os.path.join('cases', m.group(1))) as f_xml:
                     return f_xml.read().replace('\n','')
             else:
                 return value
@@ -48,6 +48,9 @@ class DictWrapper(object):
 
     def items(self):
         return self.__dict__
+
+    def __getitem__(self, key):
+        return self.__dict__[key]
 
 
 class ResponseWrapper(object):

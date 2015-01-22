@@ -2,6 +2,7 @@ from logging import getLogger
 from rester.struct import ResponseWrapper
 import json
 import requests
+import xmltodict
 
 
 class HttpClient(object):
@@ -22,9 +23,12 @@ class HttpClient(object):
             raise
         response = func(api_url, headers=headers, params=params, **self.extra_request_opts)
 
-        if is_raw or 'application/json' not in response.headers['content-type']:
+        if not is_raw and 'application/json' not in response.headers['content-type']:
+            if 'application/xml' in response.headers['content-type']:
+                payload = json.loads(json.dumps(xmltodict.parse(response.text)))
+        elif is_raw:
             payload = {"__raw__": response.text}
-        else:    
+        else:
             payload = response.json()
 
         if response.status_code < 300:

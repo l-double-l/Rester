@@ -12,6 +12,7 @@ Failure = collections.namedtuple("Failure", "errors output")
 
 class TestCaseExec(object):
     logger = getLogger(__name__)
+    logic_ops = dict()
 
     def __init__(self, case, options):
         self.case = case
@@ -19,6 +20,7 @@ class TestCaseExec(object):
         self.passed = []
         self.failed = []
         self.skipped = []
+        self.logic_ops = {'-gt':'>', '-ge':'>=', '-lt':'<', '-le':'<=', '-ne':'!=', '-eq':'==', 'exec': 'exec'}
 
     def __call__(self):
         # What was this?
@@ -66,7 +68,8 @@ class TestCaseExec(object):
         return params
 
     def _execute_test_step(self, test_step):
-        http_client = HttpClient(**dict(test_step.get('request_opts', {}).items().items() + self.case.request_opts.items()))
+        r_options = {k:self.case.variables.expand(v) for k,v in dict(test_step.get('request_opts', DictWrapper({})).items().items() + self.case.request_opts.items()).items()}
+        http_client = HttpClient(**r_options)
         failures = Failure([], None)
         try:
             method = getattr(test_step, 'method', 'get')
@@ -151,18 +154,17 @@ class TestCaseExec(object):
 
 
             # Check for logical operators
-            logic_ops = {'-gt':'>', '-ge':'>=', '-lt':'<', '-le':'<=', '-ne':'!=', '-eq':'==', 'exec': 'exec'}
             lg_op_expr = check_for_logical_op(value)
             if lg_op_expr:
                 self.logger.debug("---> Found lg_op_expr : " + lg_op_expr)
 
-            if lg_op_expr in logic_ops:
-                final_lg_op = logic_ops[lg_op_expr]
+            if lg_op_expr in self.logic_ops:
+                final_lg_op = self.logic_ops[lg_op_expr]
                 value = value[len(lg_op_expr):]
                 self.logger.debug("     -----> Rest of the expression : " + value)
             else:
                 # - If no operators found then assume '=='
-                final_lg_op = logic_ops['-eq']
+                final_lg_op = self.logic_ops['-eq']
 
             self.logger.debug("---> Final final_lg_op : " + final_lg_op)
 
@@ -181,7 +183,7 @@ class TestCaseExec(object):
             else:
                 assert_expr = 'exec_result = {0}'.format(value)
                 assert_literal_expr = '"f({0}) <- {1}"'.format(json_eval_expr, value)
-                exec(assert_expr)
+                #exec(assert_expr)
                 assert_result = _evaluate(value, json_eval_expr)
 
             self.logger.debug('assert evaluation result  : %s', assert_result)
@@ -195,8 +197,15 @@ class TestCaseExec(object):
                 self.logger.info('%s', assert_message)
 
     def _process_post_asserts(self, response, key, value):
-        self.logger.debug("evaled value: {}".format(getattr(response, value, '')))
-        self.case.variables.add_variable(key, getattr(response, value, ''))
+        lg_op_expr = check_for_logical_op(value)
+        json_eval_expr = ""
+        if lg_op_expr in self.logic_ops:
+            final_lg_op = self.logic_ops[lg_op_expr]
+            if final_lg_op is 'exec':
+                value = _evaluate(value[len(final_lg_op):], response)
+
+        self.logger.debug("evaled value: {}".format(getattr(response, value, value)))
+        self.case.variables.add_variable(key, getattr(response, value, value))
 
 def _evaluate(clause, value):
     assert_expr = 'result = {0}'.format(clause)
