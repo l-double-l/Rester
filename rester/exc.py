@@ -68,10 +68,12 @@ class TestCaseExec(object):
         return params
 
     def _execute_test_step(self, test_step):
-        r_options = {k:self.case.variables.expand(v) for k,v in dict(test_step.get('request_opts', DictWrapper({})).items().items() + self.case.request_opts.items()).items()}
-        http_client = HttpClient(**r_options)
         failures = Failure([], None)
+
         try:
+            r_options = {k:self.case.variables.expand(v) for k,v in dict(test_step.get('request_opts', DictWrapper({})).items().items() + self.case.request_opts.items()).items()}
+            http_client = HttpClient(**r_options)
+
             method = getattr(test_step, 'method', 'get')
             is_raw = getattr(test_step, 'raw', False)
             self.logger.info('\n=======> Executing TestStep : %s, method : %s', test_step.name, method)
@@ -105,6 +107,11 @@ class TestCaseExec(object):
             else:
                 self.logger.warn('\n=======> No "asserts" element found in TestStep %s', test_step.name)
 
+            # execute all the assignment statements
+            if hasattr(test_step, 'postAsserts') and test_step.postAsserts is not None:          
+                for key, value in test_step.postAsserts.items().items():
+                    self._process_post_asserts(response_wrapper.body, key, value)
+
         except Exception as inst:
             failures.errors.append(traceback.format_exc())
             self.logger.error('ERROR !!! TestStep %s Failed to execute !!!  %s \
@@ -114,11 +121,6 @@ class TestCaseExec(object):
         if failures.errors:
             return failures
         
-        # execute all the assignment statements
-        if hasattr(test_step, 'postAsserts') and test_step.postAsserts is not None:          
-            for key, value in test_step.postAsserts.items().items():
-                self._process_post_asserts(response_wrapper.body, key, value)
-
         return None
 
     def _assert_element_list(self, section, failures, test_step, response, assert_list):
@@ -197,13 +199,17 @@ class TestCaseExec(object):
                 self.logger.info('%s', assert_message)
 
     def _process_post_asserts(self, response, key, value):
+        value = self.case.variables.expand(value)
         lg_op_expr = check_for_logical_op(value)
         json_eval_expr = ""
         if lg_op_expr in self.logic_ops:
             final_lg_op = self.logic_ops[lg_op_expr]
             if final_lg_op is 'exec':
-                value = _evaluate(value[len(final_lg_op):], response)
-
+                try:
+                    value = _evaluate(value[len(final_lg_op):], response)
+                except Exception,e:
+                     self.logger.error("error in postAssert evaluation. Possible wrong input. response: {}".format(str(response)), e)
+                     raise RuntimeError('postAsserts is not evaluated. Further execution may cause unpredictable state.')
         self.logger.debug("evaled value: {}".format(getattr(response, value, value)))
         self.case.variables.add_variable(key, getattr(response, value, value))
 

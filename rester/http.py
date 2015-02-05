@@ -35,6 +35,8 @@ class HttpClient(object):
             emit = self.logger.debug
         else:
             emit = self.logger.warn
+            payload = {"response": response.text}
+
         emit('Response Headers: %s', str(response.headers))
         if is_raw:
             emit('Response:\n%s\n' + response.text)

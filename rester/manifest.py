@@ -29,6 +29,11 @@ class Variables(object):
     def add_variable(self, key, value):
         if self._variables.get(key, ''):
             self.logger.warn('WARN!!! Variable : %s Already defined!!!', key)
+        
+        expr = 'exec '
+        if value.find(expr) >= 0:
+            exec("value = {0}".format(value[len(expr):], value))
+
         self._variables[key] = self.expand(value)
 
     def expand(self, expression):
