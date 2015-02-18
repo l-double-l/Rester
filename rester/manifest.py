@@ -31,7 +31,7 @@ class Variables(object):
             self.logger.warn('WARN!!! Variable : %s Already defined!!!', key)
         
         expr = 'exec '
-        if value.find(expr) >= 0:
+        if isinstance(value, basestring) and value.find(expr) >= 0:
             exec("value = {0}".format(value[len(expr):], value))
 
         self._variables[key] = self.expand(value)

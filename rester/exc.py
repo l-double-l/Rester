@@ -61,7 +61,6 @@ class TestCaseExec(object):
     def _format_logs(self, lc):
         for r in lc.actual():
             yield "%s: %s - %s\n" % (r[1], r[0], r[2])
-
     def _build_param_dict(self, test_step):
         params = {}
         if hasattr(test_step, 'params') and test_step.params is not None:
@@ -73,8 +72,8 @@ class TestCaseExec(object):
         failures = Failure([], None)
 
         try:
-            r_options = {k:self.case.variables.expand(v) for k,v in dict(test_step.get('request_opts', DictWrapper({})).items().items() + self.case.request_opts.items()).items()}
-            http_client = HttpClient(**r_options)
+            r_options = {k:self.case.variables.expand(v) for k,v in dict(test_step.get('request_opts', DictWrapper({})).items().items() + http_client.extra_request_opts.items()).items()}
+            #http_client = HttpClient(**r_options)
 
             method = getattr(test_step, 'method', 'get')
             is_raw = getattr(test_step, 'raw', False)
@@ -92,7 +91,7 @@ class TestCaseExec(object):
 
             url = self.case.variables.expand(test_step.apiUrl)
             self.logger.debug('Evaluated URL : %s', url)
-            response_wrapper = http_client.request(url, method, headers, params, is_raw)
+            response_wrapper = http_client.request(url, method, headers, params, r_options, is_raw)
 
             # expected_status = getattr(getattr(test_step, 'asserts'), 'status', 200)
             # if response_wrapper.status != expected_status:

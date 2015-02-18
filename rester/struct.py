@@ -25,7 +25,7 @@ class DictWrapper(object):
         if isinstance(value, str) or isinstance(value, unicode):
             m = re.search('@!(.*)!@', value)
             if m:
-                with open(os.path.join('cases', m.group(1))) as f_xml:
+                with open(os.path.join('', m.group(1))) as f_xml:
                     return f_xml.read().replace('\n','')
             else:
                 return value
