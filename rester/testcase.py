@@ -52,14 +52,14 @@ class ApiTestCaseRunner:
             if result.get('failed'):
                 c = bcolors.FAIL
 
-            print c, result.get('name'),
+            columns = "{0:40}|{1:8}|{2:8}|{3:8}{4:6}"
+            row = []
+            row.append('{0}{1} '.format(c, result.get('name')))
             for k in ['passed', 'failed', 'skipped']:
-                print "%s: %d " % (k, len(result.get(k))),
-            print bcolors.ENDC
+                row.append("%s: %d" % (k, len(result.get(k))))
+            row.append(bcolors.ENDC)
+            print columns.format(*row)
             #print c, yaml.dump(result, default_flow_style=False,), bcolors.ENDC
-
-
-            
 
             #self.logger.info("name: {}\n{}\n", name, )
 #            test_case = exc.case
