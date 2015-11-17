@@ -56,8 +56,7 @@ class DictWrapper(object):
 class ResponseWrapper(object):
     def __init__(self, status, data, headers):
         self.status = status
-        data = {key: (value.encode('ascii', 'ignore') if isinstance(value, str) else value) for key, value in data.iteritems()}
+        data = {key: (value.encode('ascii', 'replace') if isinstance(value, str) or isinstance(value, unicode) else value) for key, value in data.iteritems()}
         self.body = DictWrapper(data)
         self.headers = DictWrapper(headers)
         self.headers.status = status
-
