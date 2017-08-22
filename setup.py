@@ -1,10 +1,10 @@
 from setuptools import setup
 
 setup(name='Rester',
-    version='1.0.1',
-    author='Rajeev Chitamoor',
-    author_email='rajeev@chitamoor.com',
-    url='https://github.com/chitamoor/rester',
+    version='1.1.1',
+    author='Markidonov Kirill',
+    author_email='gmaridonov@gmail.com',
+    url='https://github.com/l-double-l/Rester',
     license='LICENSE.txt',
     packages=['rester'],
     entry_points={
