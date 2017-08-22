@@ -34,19 +34,19 @@ class ApiTestCaseRunner:
         for result in self.results:
             if not result['failed']:
                 continue
-            print "\n\n ############################ FAILED ############################"
+            print("\n\n ############################ FAILED ############################")
             for e in result['failed']:
-                print bcolors.FAIL, result.get('name'), ":", e['name']
-                print bcolors.ENDC
+                print(bcolors.FAIL , result.get('name') , ":" , e['name'])
+                print(bcolors.ENDC)
                 for i, error in enumerate(e['errors']):
-                    print "%d." % i
-                    print error
-                    print
-                print "-------- LOG OUTPUT --------"
-                print e['logs']
-                print "---------------------------"
+                    print("%d." % i)
+                    print(error)
+                    print()
+                print("-------- LOG OUTPUT --------")
+                print(e['logs'])
+                print("---------------------------")
 
-        print "\n\n ############################ RESULTS ############################"
+        print("\n\n ############################ RESULTS ############################")
         for result in self.results:
             c = bcolors.OKGREEN
             if result.get('failed'):
@@ -58,23 +58,23 @@ class ApiTestCaseRunner:
             for k in ['passed', 'failed', 'skipped']:
                 row.append("%s: %d" % (k, len(result.get(k))))
             row.append(bcolors.ENDC)
-            print columns.format(*row)
-            #print c, yaml.dump(result, default_flow_style=False,), bcolors.ENDC
+            print (columns.format(*row))
+            #print(c, yaml.dump(result, default_flow_style=False,), bcolors.ENDC
 
             #self.logger.info("name: {}\n{}\n", name, )
 #            test_case = exc.case
-#            print "\n\n ===> TestCase : {0}, status : {1}".format(test_case.name, "Passed" if test_case.passed == True else "Failed!")
+#            print("\n\n ===> TestCase : {0}, status : {1}".format(test_case.name, "Passed" if test_case.passed == True else "Failed!")
 #            for test_step in test_case.testSteps:
 #                #self.logger.info('\n     ====> Test Step name : %s, status : %s, message : %s', test_step.name, test_step.result.status, test_step.result.message)
-#                print "\n\n     ====> Test Step : {0}".format(test_step.name)
+#                print("\n\n     ====> Test Step : {0}".format(test_step.name)
 #
 #                if hasattr(test_step, 'result'):
-#                    print "\n\n         ====> {0}!".format(test_step.result.message)
+#                    print("\n\n         ====> {0}!".format(test_step.result.message)
 #
 #                if hasattr(test_step, 'assertResults'):
 #                    for assert_result in test_step.assertResults:
 #                        #self.logger.debug('\n assert_result : ' + str(assert_result))
-#                        print "\n        ---> {0}".format(assert_result['message'])
+#                        print("\n        ---> {0}".format(assert_result['message'])
 
 
     def _run_case(self, case):
