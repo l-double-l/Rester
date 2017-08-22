@@ -6,7 +6,7 @@ setup(name='Rester',
     author_email='gmaridonov@gmail.com',
     url='https://github.com/l-double-l/Rester',
     license='LICENSE.txt',
-    packages=['rester', 'testcase'],
+    packages=['rester'],
     entry_points={
         'console_scripts':['apirunner = rester.apirunner:run']
     },

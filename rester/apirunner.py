@@ -1,7 +1,7 @@
-from testcase.testcase import ApiTestCaseRunner
 import argparse
 import logging
-import sys
+
+from rester.testcase import ApiTestCaseRunner
 
 DEFAULT_TEST_CASE = 'test_case.json'
 
