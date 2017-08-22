@@ -16,7 +16,7 @@ class Variables(object):
         self._variables = variables or {}
 
     def __iter__(self):
-        for k, v in self._variables.iteritems():
+        for k, v in self._variables.items():
             yield k, v
 
     def get(self, k, default):
