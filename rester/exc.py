@@ -149,8 +149,8 @@ class TestCaseExec(object):
                     value = 'Object'
                     json_eval_expr = {}
 
-                if type(json_eval_expr) == unicode:
-                    json_eval_expr = ''
+#                if type(json_eval_expr) == unicode:
+#                    json_eval_expr = ''
 
                 value = eval(json_types[value])
                 json_eval_expr = type(json_eval_expr)
@@ -208,7 +208,7 @@ class TestCaseExec(object):
             if final_lg_op is 'exec':
                 try:
                     value = _evaluate(value[len(final_lg_op):], response)
-                except Exception,e:
+                except Exception as e:
                      self.logger.error("error in postAssert evaluation. Possible wrong input. response: {}".format(str(response)), e)
                      raise RuntimeError('postAsserts is not evaluated. Further execution may cause unpredictable state.')
         self.logger.debug("evaled value: {}".format(getattr(response, value, value)))

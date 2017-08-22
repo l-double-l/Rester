@@ -60,7 +60,7 @@ class Variables(object):
 # Module level functions
 def is_string(expression):
     #self.logger.debug(" _is_string : %s ", type(expression))
-    return expression and (isinstance(expression, unicode) or isinstance(expression, str))
+    return expression and (isinstance(expression, str))
 
 
 def is_number(expression):

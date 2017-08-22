@@ -22,7 +22,7 @@ class DictWrapper(object):
         return self.__dict__.get(name, default)
 
     def __transform_value(self, value):
-        if isinstance(value, str) or isinstance(value, unicode):
+        if isinstance(value, str):
             m = re.search('@!(.*)!@', value)
             if m:
                 with open(os.path.join('', m.group(1))) as f_xml:
@@ -56,7 +56,7 @@ class DictWrapper(object):
 class ResponseWrapper(object):
     def __init__(self, status, data, headers):
         self.status = status
-        data = {key: (value.encode('ascii', 'replace') if isinstance(value, str) or isinstance(value, unicode) else value) for key, value in data.iteritems()}
+        data = {key: (value.encode('ascii', 'replace') if isinstance(value, str) else value) for key, value in data.iteritems()}
         self.body = DictWrapper(data)
         self.headers = DictWrapper(headers)
         self.headers.status = status
